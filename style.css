@@ -1,0 +1,22 @@
+html, body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+.focus-ring { outline: 2px solid transparent; outline-offset: 2px; }
+.focus-ring:focus { outline-color: rgb(59 130 246); box-shadow: 0 0 0 4px rgba(59,130,246,0.2); }
+
+/* Toggle (Auto Split) basic styling improvement for appearance-none input */
+#auto-split { transition: background-color .2s ease, box-shadow .2s ease; }
+#auto-split::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: white;
+  box-shadow: 0 1px 2px rgba(0,0,0,.1);
+  transition: transform .2s ease;
+}
+#auto-split:checked { background-color: rgb(59 130 246); }
+#auto-split:checked::before { transform: translateX(12px); }
+
+
