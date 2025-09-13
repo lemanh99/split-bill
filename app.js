@@ -61,6 +61,9 @@
       <div class="mt-2 sm:mt-3">
         <input class="w-full rounded-lg border border-slate-300 py-1.5 sm:py-2 px-2 sm:px-3 text-xs sm:text-sm focus-ring person-email" type="email" placeholder="Email (optional)" />
       </div>
+      <div class="mt-2 sm:mt-3">
+        <textarea class="w-full rounded-lg border border-slate-300 py-1.5 sm:py-2 px-2 sm:px-3 text-xs sm:text-sm focus-ring person-note resize-none" rows="2" placeholder="Note (optional)"></textarea>
+      </div>
       <div class="mt-2 sm:mt-3 grid grid-cols-2 gap-1.5 sm:gap-2">
         <div class="flex rounded-lg border border-slate-300 overflow-hidden">
           <button type="button" class="mode-btn basis-1/2 py-1.5 sm:py-2 text-xs sm:text-sm font-medium hover:bg-slate-50" data-mode="percent">Percent</button>
@@ -96,6 +99,7 @@
     const nameEl = wrapper.querySelector('.person-name');
     const avatarEl = wrapper.querySelector('.avatar');
     const emailEl = wrapper.querySelector('.person-email');
+    const noteEl = wrapper.querySelector('.person-note');
     const modeBtns = wrapper.querySelectorAll('.mode-btn');
     const percentEl = wrapper.querySelector('.percent-input');
     const amountEl = wrapper.querySelector('.amount-input');
@@ -103,7 +107,7 @@
     const percentIncreaseBtn = wrapper.querySelector('.percent-increase');
     const percentDecreaseBtn = wrapper.querySelector('.percent-decrease');
 
-    const person = { nameEl, avatarEl, emailEl, percentEl, amountEl, mode: 'percent', wrapper };
+    const person = { nameEl, avatarEl, emailEl, noteEl, percentEl, amountEl, mode: 'percent', wrapper };
     participants.push(person);
 
     function setMode(mode) {
@@ -114,10 +118,21 @@
         btn.classList.toggle('text-white', active);
         btn.classList.toggle('border-brand-600', active);
       });
-      // Always allow editing both percent and amount inputs
-      // Auto split will be automatically disabled when user starts editing
-      percentEl.disabled = false;
-      amountEl.disabled = false;
+      
+      // When percent mode is selected, disable amount input
+      // When amount mode is selected, hide percent input
+      if (mode === 'percent') {
+        percentEl.disabled = false;
+        amountEl.disabled = true;
+        percentEl.parentElement.style.display = 'block';
+        amountEl.parentElement.style.display = 'block';
+      } else if (mode === 'amount') {
+        percentEl.disabled = true;
+        amountEl.disabled = false;
+        percentEl.parentElement.style.display = 'none';
+        amountEl.parentElement.style.display = 'block';
+      }
+      
       compute();
     }
     person.setMode = setMode;
@@ -143,7 +158,10 @@
       }
     };
 
-    percentEl.addEventListener('click', disableAutoSplit);
+    percentEl.addEventListener('click', () => {
+      disableAutoSplit();
+      setMode('percent');
+    });
     percentEl.addEventListener('input', () => { 
       participantsEverEdited = true; 
       setMode('percent');
@@ -156,7 +174,10 @@
       }
     });
     
-    amountEl.addEventListener('click', disableAutoSplit);
+    amountEl.addEventListener('click', () => {
+      disableAutoSplit();
+      setMode('amount');
+    });
     amountEl.addEventListener('input', () => {
       participantsEverEdited = true;
       setMode('amount');
@@ -220,6 +241,15 @@
   function highlightTip(percent) {
     tipBtns.forEach(btn => {
       const isActive = Number(btn.dataset.tip) === percent;
+      btn.classList.toggle('bg-brand-600', isActive);
+      btn.classList.toggle('text-white', isActive);
+      btn.classList.toggle('border-brand-600', isActive);
+    });
+  }
+
+  function highlightTax(percent) {
+    taxPresetBtns.forEach(btn => {
+      const isActive = Number(btn.dataset.tax) === percent;
       btn.classList.toggle('bg-brand-600', isActive);
       btn.classList.toggle('text-white', isActive);
       btn.classList.toggle('border-brand-600', isActive);
@@ -306,6 +336,7 @@
         perList.push({ 
           name: (p.nameEl.value || '').trim() || 'Guest', 
           email: (p.emailEl.value || '').trim() || '',
+          note: (p.noteEl.value || '').trim() || '',
           owed: Math.max(0, owed) 
         });
       });
@@ -343,6 +374,7 @@
         perList.push({ 
           name: (p.nameEl.value || '').trim() || 'Guest', 
           email: (p.emailEl.value || '').trim() || '',
+          note: (p.noteEl.value || '').trim() || '',
           owed 
         });
       });
@@ -363,9 +395,18 @@
     outPeople.innerHTML = '';
     perList.forEach(item => {
       const row = document.createElement('div');
-      row.className = 'flex items-center justify-between rounded-lg border border-slate-200 bg-white px-2 sm:px-3 py-1.5 sm:py-2';
+      row.className = 'rounded-lg border border-slate-200 bg-white px-2 sm:px-3 py-1.5 sm:py-2';
+      
       const nameDisplay = item.email ? `${item.name} (${item.email})` : item.name;
-      row.innerHTML = `<span class="text-xs sm:text-sm text-slate-700">${nameDisplay}</span><span class="text-xs sm:text-sm font-medium">${formatter.format(Math.max(0, item.owed))}</span>`;
+      const noteDisplay = item.note ? `<div class="text-xs text-slate-500 mt-1">${item.note}</div>` : '';
+      
+      row.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="text-xs sm:text-sm text-slate-700">${nameDisplay}</span>
+          <span class="text-xs sm:text-sm font-medium">${formatter.format(Math.max(0, item.owed))}</span>
+        </div>
+        ${noteDisplay}
+      `;
       outPeople.appendChild(row);
     });
     if (warningMsg) {
@@ -402,6 +443,7 @@
 
   function generateBreakdownText() {
     const r = compute();
+    
     const lines = [
       `Subtotal: ${formatter.format(r.subtotal)}`,
       `Tax (${r.taxPct}%): ${formatter.format(r.taxAmount)}`,
@@ -413,10 +455,14 @@
       `Individual breakdown:`
     ];
     
-    // Add individual breakdown with email if available
+    // Add individual breakdown with email and note if available
     r.perList.forEach(item => {
       const nameDisplay = item.email ? `${item.name} (${item.email})` : item.name;
-      lines.push(`${nameDisplay}: ${formatter.format(item.owed)}`);
+      let line = `${nameDisplay}: ${formatter.format(item.owed)}`;
+      if (item.note) {
+        line += ` - ${item.note}`;
+      }
+      lines.push(line);
     });
     
     if (Math.abs(r.roundingAdjustment) >= 0.005) {
@@ -424,6 +470,7 @@
       lines.push(``);
       lines.push(`Rounding adjustment: ${formatter.format(adj)}`);
     }
+    
     return lines.join('\n');
   }
 
