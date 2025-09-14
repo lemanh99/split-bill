@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  db-postgres:
+    image: postgres:16.2-bullseye
+    environment:
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pg_data
+    ports:
+      - ${DATABASE_PORT}:5432
+    volumes:
+      - pg-data:/var/lib/postgresql/data/pg_data
+    networks:
+      - bill-faster-reminder-network
+
+#  bill-faster-be:
+#    build:
+#      context: .
+#    command: bash -c "python main.py"
+#    ports:
+#      - "${API_PORT}:8018"
+#    networks:
+#      - bill-faster-reminder-network
+#    env_file:
+#      - .env
+#    depends_on:
+#      - db-postgres
+
+  minio:
+    image: bitnami/minio:2024.5.28
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - "minio_data:/minio"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_PASSWORD}
+
+  minio-setup:
+    image: bitnami/minio-client:2024.5.24
+    depends_on:
+      - minio
+    volumes:
+      - ./.minio:/tmp/config
+    environment:
+      - MINIO_HOST=minio
+      - MINIO_ROOT_USER=${MINIO_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_PASSWORD}
+      - BUCKET_NAME=${S3_FILES_BUCKET_NAME}
+      - PUBLIC_BUCKET_NAME=${S3_FILES_PUBLIC_BUCKET_NAME}
+      - BUCKET_TESTING_NAME=testing-${S3_FILES_BUCKET_NAME}
+      - POLICY_FILE=/tmp/config/policy.json
+      - ACCESS_KEY=${AWS_ACCESS_KEY_ID}
+      - SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    entrypoint:
+      [
+        "bash",
+        "-c",
+        "chmod +x /tmp/config/local.sh && chmod +x /tmp/config/configure.sh && /tmp/config/local.sh /tmp/config/configure.sh",
+      ]
+
+volumes:
+  pg-data:
+    driver: local
+  minio_data:
+    driver: local
+
+networks:
+  bill-faster-reminder-network:
+    driver: bridge
