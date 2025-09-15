@@ -31,8 +31,8 @@ services:
   minio:
     image: bitnami/minio:2024.5.28
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9002:9000"
+      - "9003:9001"
     volumes:
       - "minio_data:/minio"
     environment:
