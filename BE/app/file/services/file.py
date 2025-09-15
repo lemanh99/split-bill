@@ -1,3 +1,5 @@
+from io import BytesIO
+
 from fastapi import UploadFile
 
 import config
@@ -40,7 +42,7 @@ class FileService(BillFasterBaseService):
         return {
             "file_name": file_system.file_name,
             "file_type": file_system.file_type,
-            "url": url,
+            "file_url": url,
         }
 
     async def delete_file(self, file_id: int):

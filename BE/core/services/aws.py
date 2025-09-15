@@ -18,7 +18,7 @@ class S3Service:
             aws_secret_access_key=config.AWS_SECRET_ACCESS_KEY,
             **kwargs,
         )
-        self.client = session.client("s3")
+        self.client = session.client("s3", endpoint_url=config.AWS_S3_ENDPOINT_URL, )
 
     def bucket_upload_object(self, bucket_name, file_key, file_content, **kwargs):
         try:

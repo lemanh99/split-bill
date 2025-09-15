@@ -9,7 +9,7 @@ class Bill(BillFasterBaseModel):
     __tablename__ = "t_bills"
 
     bill_number = Column(String(length=100), unique=True, nullable=False, index=True)
-    bill_file_id = Column(ForeignKey("t_file_systems.id"), nullable=True, index=True)
+    bill_file_id = Column(Integer, nullable=True)
 
     type = Column(SmallInteger, nullable=False, default=BillType.SIMPLE)
     share_type = Column(SmallInteger, nullable=False, default=BillShareType.PUBLIC)
@@ -28,7 +28,7 @@ class Bill(BillFasterBaseModel):
     payment_flag = Column(Boolean, nullable=False, default=False)
     payment_method = Column(SmallInteger, nullable=True)
     payment_note = Column(Text, nullable=True)
-    payment_file_id = Column(ForeignKey("t_file_systems.id"), nullable=True)
+    payment_file_id = Column(Integer, nullable=True)
 
 class BillItem(BillFasterBaseModel):
     __tablename__ = "t_bill_items"
