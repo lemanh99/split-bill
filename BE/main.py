@@ -9,5 +9,5 @@ if __name__ == "__main__":
         port=config.API_PORT,
         timeout_keep_alive=config.API_TIMEOUT_ALIVE,
         workers=config.WORKER_NUM,
-        reload=True
+        reload=True,
     )

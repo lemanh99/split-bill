@@ -68,6 +68,14 @@ DEFAULT_LANGUAGE_MESSAGE = "en"
 DEFAULT_TIMEZONE_SERVER = os.getenv("DEFAULT_TIMEZONE_SERVER", "UTC")
 DEFAULT_TIMEZONE_USER = os.getenv("DEFAULT_TIMEZONE_USER", "UTC")
 
+# ---------------------------- AWS --------------------------------
+AWS_REGION = os.getenv("AWS_REGION", "ap-southeast-1")
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_S3_BUCKET_NAME = os.getenv("AWS_S3_BUCKET_NAME")
+AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
+
+
 # --------------------------- SOCIAL --------------------------------
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")

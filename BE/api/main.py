@@ -10,7 +10,6 @@ from api.routers import routers
 from app.common.handlers import base_error_handler, validation_exception_handler
 from app.common.middlewares.language import LanguageBabelMiddleware
 from core.common.exceptions import BillFasterBaseException
-from core.common.redis import redis_connection, redis_close
 
 if config.ENVIRONMENT == "pro":
     docs_url, redoc_url, openapi_url = None, None, None
@@ -25,7 +24,6 @@ app = FastAPI(
     redoc_url=redoc_url,
     openapi_url=openapi_url,
 )
-
 
 app.add_middleware(
     CORSMiddleware,

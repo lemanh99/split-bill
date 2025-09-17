@@ -21,6 +21,8 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 from core.models import BillFasterBaseModel
 from app.auth.models import *
+from app.file.models import *
+from app.bill.models import *
 
 target_metadata = BillFasterBaseModel.metadata
 # other values from the config, defined by the needs of env.py,

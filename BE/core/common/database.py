@@ -46,5 +46,3 @@ async def get_async_db_session():
         yield db
     finally:
         await db.close()
-
-
