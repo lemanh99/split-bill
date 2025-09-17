@@ -45,6 +45,7 @@ class BillCrUpSchema(BaseModel):
     bill_items: list[BillItemCrUpSchema] = Field(default_factory=list)
     bill_participants: list[BillParticipantCrUpSchema] = Field(default_factory=list)
 
+
 class BillParticipantDetailSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -91,4 +92,4 @@ class BillDetailSchema(BaseModel):
     bill_items: list[BillItemDetailSchema] = Field(default_factory=list)
     bill_participants: list[BillParticipantDetailSchema] = Field(default_factory=list)
     created_at: datetime = Field(...)
-
+    created_by: str | None = Field(default=None)

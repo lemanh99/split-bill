@@ -25,7 +25,12 @@ class BaseApiProxy(ABC):
         try:
             logger.info(
                 "Request to {} with method: {}, headers: {}, params: {}, data: {}, json: {}".format(
-                    self.service_uri, self.method, self.headers, self.params, self.data, self.json
+                    self.service_uri,
+                    self.method,
+                    self.headers,
+                    self.params,
+                    self.data,
+                    self.json,
                 )
             )
             resp = requests.request(

@@ -8,5 +8,5 @@ social_oauth.register(
     name="google",
     server_metadata_url=GOOGLE_AUTH_CONF_URL,
     client_kwargs={"scope": "openid email profile"},
-    authorize_state=JWT_ACCESS_SECRET_KEY
+    authorize_state=JWT_ACCESS_SECRET_KEY,
 )

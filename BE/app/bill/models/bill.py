@@ -1,4 +1,14 @@
-from sqlalchemy import String, Column, Text, DateTime, ForeignKey, Numeric, SmallInteger, Boolean, Integer
+from sqlalchemy import (
+    String,
+    Column,
+    Text,
+    DateTime,
+    ForeignKey,
+    Numeric,
+    SmallInteger,
+    Boolean,
+    Integer,
+)
 
 from app.common.constants import BillType, BillShareType, BillStatus
 from core.common.constants import Role
@@ -30,6 +40,7 @@ class Bill(BillFasterBaseModel):
     payment_note = Column(Text, nullable=True)
     payment_file_id = Column(Integer, nullable=True)
 
+
 class BillItem(BillFasterBaseModel):
     __tablename__ = "t_bill_items"
 
@@ -50,4 +61,3 @@ class BillParticipant(BillFasterBaseModel):
     email = Column(String(length=255), nullable=True)
     description = Column(String(length=255), nullable=True)
     payment_flag = Column(Boolean, nullable=False, default=False)
-

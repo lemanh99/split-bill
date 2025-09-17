@@ -2,6 +2,7 @@ from fastapi import Depends
 from fastapi.security import (
     HTTPBearer,
     HTTPBasicCredentials,
+    HTTPAuthorizationCredentials,
 )
 
 from app.auth.services.auth_service import AuthService
@@ -18,3 +19,19 @@ async def auth_verify(
     auth_service = AuthService(db_session)
     auth_res = await auth_service.get_current_user(access_token)
     return auth_res
+
+
+async def get_current_user(
+    db_session=Depends(get_async_db_session),
+    credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
+):
+    if not credentials:
+        return None
+
+    auth_service = AuthService(db_session)
+    access_token = credentials.credentials
+    try:
+        user = await auth_service.get_current_user(access_token)
+        return user
+    except Exception:
+        return None

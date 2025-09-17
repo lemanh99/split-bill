@@ -22,6 +22,7 @@ async def sign_in(
     result = await auth_service.sign_in(user.user_id, user.password)
     return make_success_response(result)
 
+
 @router.get("/google-sign-in")
 async def google_sign_in(request: Request, callback_url: str):
     result = await social_oauth.google.authorize_redirect(request, callback_url)
