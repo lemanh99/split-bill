@@ -11,9 +11,9 @@ services:
     ports:
       - ${DATABASE_PORT}:5432
     volumes:
-      - pg-data:/var/lib/postgresql/data/pg_data
+      - pg-bill-data:/var/lib/postgresql/data/pg_bill_data
     networks:
-      - bill-faster-reminder-network
+      - bill-faster-network
 
 #  bill-faster-be:
 #    build:
@@ -22,7 +22,7 @@ services:
 #    ports:
 #      - "${API_PORT}:8018"
 #    networks:
-#      - bill-faster-reminder-network
+#      - bill-faster-network
 #    env_file:
 #      - .env
 #    depends_on:
@@ -49,9 +49,9 @@ services:
       - MINIO_HOST=minio
       - MINIO_ROOT_USER=${MINIO_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_PASSWORD}
-      - BUCKET_NAME=${S3_FILES_BUCKET_NAME}
-      - PUBLIC_BUCKET_NAME=${S3_FILES_PUBLIC_BUCKET_NAME}
-      - BUCKET_TESTING_NAME=testing-${S3_FILES_BUCKET_NAME}
+      - BUCKET_NAME=${AWS_S3_BUCKET_NAME}
+      - PUBLIC_BUCKET_NAME=${AWS_S3_PUBLIC_BUCKET_NAME}
+      - BUCKET_TESTING_NAME=testing-${AWS_S3_BUCKET_NAME}
       - POLICY_FILE=/tmp/config/policy.json
       - ACCESS_KEY=${AWS_ACCESS_KEY_ID}
       - SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
@@ -59,15 +59,15 @@ services:
       [
         "bash",
         "-c",
-        "chmod +x /tmp/config/local.sh && chmod +x /tmp/config/configure.sh && /tmp/config/local.sh /tmp/config/configure.sh",
+        "/tmp/config/local.sh /tmp/config/configure.sh",
       ]
 
 volumes:
-  pg-data:
+  pg-bill-data:
     driver: local
   minio_data:
     driver: local
 
 networks:
-  bill-faster-reminder-network:
+  bill-faster-network:
     driver: bridge
