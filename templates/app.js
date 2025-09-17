@@ -41,6 +41,36 @@
   const outPeople = document.getElementById('out-people');
   const allocationWarning = document.getElementById('allocation-warning');
   let participantsEverEdited = false;
+  // --- API integration helpers ---
+  const API_BASE = (window.API_BASE) || 'http://127.0.0.1:8000/api';
+  async function apiUploadFile(file) {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    const resp = await fetch(`${API_BASE}/file/upload`, {
+      method: 'POST',
+      headers: { 'accept': 'application/json' },
+      body: formData,
+    });
+    if (!resp.ok) throw new Error('Upload failed');
+    const json = await resp.json();
+    return json?.data;
+  }
+  function getAccessToken() {
+    return localStorage.getItem('access_token') || '';
+  }
+  async function apiCreateBill(payload) {
+    const headers = { 'accept': 'application/json', 'Content-Type': 'application/json' };
+    const token = getAccessToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const resp = await fetch(`${API_BASE}/bill/create`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+    });
+    if (!resp.ok) throw new Error('Create bill failed');
+    const json = await resp.json();
+    return json?.data;
+  }
   function getCurrencyDecimals() {
     const cur = (document.getElementById('currency')?.value) || 'USD';
     return (cur === 'VND' || cur === 'JPY') ? 0 : 2;
@@ -531,10 +561,57 @@
       compute();
     });
   }
-  shareBtn.addEventListener('click', (e) => { e.preventDefault(); showShareModal(); });
+  shareBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    try {
+      const r = compute();
+      const decimals = getCurrencyDecimals();
+      const bill_items = [];
+      const bill_participants = r.perList.map(p => ({
+        amount: Number(p.owed.toFixed(decimals)),
+        email: p.email || null,
+        description: p.note || null,
+      }));
+      const payload = {
+        bill_file_id: typeof billFileId === 'number' ? billFileId : null,
+        type: 1,
+        share_type: 2,
+        subtotal: Number(r.subtotal.toFixed(decimals)),
+        tax_flag: !!(document.getElementById('toggle-tax')?.checked),
+        tax_percent: (document.getElementById('toggle-tax')?.checked && String(document.getElementById('tax')?.value || '').trim() !== '') ? Number((document.getElementById('tax')?.value || '0')) : 0,
+        tax_amount: Number(r.taxAmount.toFixed(decimals)),
+        tip_flag: !!(document.getElementById('toggle-tip')?.checked),
+        tip_percent: (document.getElementById('toggle-tip')?.checked && String(document.getElementById('tip')?.value || '').trim() !== '') ? Number((document.getElementById('tip')?.value || '0')) : 0,
+        tip_amount: Number(r.tipAmount.toFixed(decimals)),
+        total: Number(r.total.toFixed(decimals)),
+        currency: document.getElementById('currency')?.value || 'USD',
+        number_people: r.people,
+        payment_flag: (document.getElementById('payment-methods-toggle')?.checked) || false,
+        payment_method: 0,
+        payment_note: null,
+        payment_file_id: typeof paymentFileId === 'number' ? paymentFileId : null,
+        bill_items,
+        bill_participants,
+      };
+      const data = await apiCreateBill(payload);
+      const billNumber = data?.bill_number;
+      if (!billNumber) throw new Error('No bill number');
+      const shareUrl = `${window.location.origin}/api/bill/share/${encodeURIComponent(billNumber)}`;
+      document.getElementById('share-url').value = shareUrl;
+      generateQRCode(shareUrl);
+      const shareModal = document.getElementById('share-modal');
+      shareModal.classList.remove('hidden');
+      shareModal.classList.add('flex');
+    } catch (err) {
+      console.error(err);
+      showNotification('Failed to create bill. Please try again.', 'error');
+    }
+  });
 
   // Bill Upload functionality
   let uploadedFile = null;
+  let billFileId = null;
+  let paymentFileId = null;
 
   // File upload handling
   billUploadEl?.addEventListener('change', handleFileUpload);
@@ -605,16 +682,18 @@
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-  function processBill(file) {
+  async function processBill(file) {
     processingStatusEl.classList.remove('hidden');
-    
-    // Simulate OCR processing (in real app, this would call an OCR service)
-    setTimeout(() => {
-      // Mock extracted data
-      const mockData = extractBillData(file);
-      autoFillForm(mockData);
-      processingStatusEl.classList.add('hidden');
-    }, 2000);
+    try {
+      const uploaded = await apiUploadFile(file);
+      billFileId = uploaded?.id ?? null;
+    } catch (e) {
+      showNotification('Upload failed. You can still continue without the file.', 'error');
+    }
+    // Keep local auto-fill to help user quickly
+    const mockData = extractBillData(file);
+    autoFillForm(mockData);
+    processingStatusEl.classList.add('hidden');
   }
 
   function extractBillData(file) {
@@ -745,7 +824,7 @@
     }
   });
 
-  qrPaymentFile?.addEventListener('change', (e) => {
+  qrPaymentFile?.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (file) {
       console.log('File selected:', file.name, file.type, file.size);
@@ -762,6 +841,14 @@
       if (file.size > maxSize) {
         alert('File size must be less than 5MB.');
         return;
+      }
+
+      // Upload to backend to get payment_file_id
+      try {
+        const uploaded = await apiUploadFile(file);
+        paymentFileId = uploaded?.id ?? null;
+      } catch (e) {
+        showNotification('QR image upload failed. You can still proceed.', 'error');
       }
 
       // Create FileReader to display image
