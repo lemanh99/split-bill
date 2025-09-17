@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Restaurant Bill Splitter</title>
+  <meta name="description" content="Professional restaurant bill calculator with itemized splitting and service charges.">
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a'
+            },
+            restaurant: {
+              50: '#fef7ee',
+              100: '#fdedd3',
+              200: '#fbd7a5',
+              300: '#f8b86d',
+              400: '#f59432',
+              500: '#f2760a',
+              600: '#e35d05',
+              700: '#bc4508',
+              800: '#95370e',
+              900: '#782f0f'
+            }
+          }
+        }
+      },
+      darkMode: 'media'
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+</head>
+<body class="h-full bg-slate-50 text-slate-900 antialiased selection:bg-restaurant-200">
+  <!-- Header Navbar -->
+  <header class="bg-white shadow-sm border-b border-slate-200">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Logo/Brand -->
+        <div class="flex items-center">
+          <a href="index.html" class="text-lg sm:text-xl font-semibold text-slate-900 hover:text-restaurant-600 transition-colors">
+            🍽️ Restaurant Split
+          </a>
+        </div>
+        
+        <!-- Desktop Navigation Links -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="index.html" class="text-slate-600 hover:text-slate-900 px-3 py-2 text-sm font-medium">Simple Split</a>
+          <a href="restaurant.html" class="text-restaurant-600 hover:text-restaurant-700 px-3 py-2 text-sm font-medium border-b-2 border-restaurant-600">Restaurant</a>
+          <a href="#" class="text-slate-600 hover:text-slate-900 px-3 py-2 text-sm font-medium">History</a>
+          <a href="#" class="text-slate-600 hover:text-slate-900 px-3 py-2 text-sm font-medium">About</a>
+        </div>
+        
+        <!-- Desktop Login Button -->
+        <div class="hidden md:flex items-center space-x-4">
+          <button id="login-btn" class="bg-restaurant-600 hover:bg-restaurant-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors focus-ring">
+            Login
+          </button>
+        </div>
+        
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden flex items-center space-x-2">
+          <button id="mobile-login-btn" class="bg-restaurant-600 hover:bg-restaurant-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-ring">
+            Login
+          </button>
+          <button id="mobile-menu-btn" class="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus-ring">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Mobile Menu -->
+      <div id="mobile-menu" class="md:hidden hidden border-t border-slate-200 bg-white">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+          <a href="index.html" class="block px-3 py-2 text-slate-600 hover:text-slate-900 text-sm font-medium">Simple Split</a>
+          <a href="restaurant.html" class="block px-3 py-2 text-restaurant-600 hover:text-restaurant-700 text-sm font-medium">Restaurant</a>
+          <a href="#" class="block px-3 py-2 text-slate-600 hover:text-slate-900 text-sm font-medium">History</a>
+          <a href="#" class="block px-3 py-2 text-slate-600 hover:text-slate-900 text-sm font-medium">About</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="min-h-full p-3 sm:p-6">
+    <div class="max-w-6xl mx-auto">
+      <!-- Restaurant Info Section -->
+      <div class="bg-gradient-to-r from-restaurant-500 to-restaurant-600 rounded-2xl shadow-lg p-4 sm:p-6 mb-6 text-white">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold mb-2">Restaurant Bill Calculator</h1>
+            <p class="text-restaurant-100 text-sm sm:text-base">Professional bill splitting with itemized orders and service charges</p>
+          </div>
+          <div class="hidden sm:block">
+            <svg class="w-16 h-16 text-restaurant-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+        <!-- Left Column: Order Items & Settings -->
+        <div class="xl:col-span-2 space-y-4 sm:space-y-6">
+          <!-- Currency & Restaurant Settings -->
+          <section class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-4 sm:p-6">
+            <header class="mb-4 sm:mb-6">
+              <h2 class="text-lg sm:text-xl font-semibold tracking-tight">Restaurant Settings</h2>
+            </header>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="currency" class="block text-sm font-medium text-slate-700 mb-2">Currency</label>
+                <select id="currency" class="w-full rounded-xl border border-slate-300 bg-white py-3 px-4 text-sm focus-ring">
+                  <option value="USD" selected>USD – $</option>
+                  <option value="EUR">EUR – €</option>
+                  <option value="GBP">GBP – £</option>
+                  <option value="JPY">JPY – ¥</option>
+                  <option value="VND">VND – ₫</option>
+                  <option value="AUD">AUD – $</option>
+                </select>
+              </div>
+              
+              <div>
+                <label for="restaurant-name" class="block text-sm font-medium text-slate-700 mb-2">Restaurant Name</label>
+                <input id="restaurant-name" type="text" placeholder="Enter restaurant name" class="w-full rounded-xl border border-slate-300 bg-white py-3 px-4 text-sm focus-ring">
+              </div>
+            </div>
+          </section>
+
+          <!-- Order Items -->
+          <section class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-4 sm:p-6">
+            <header class="mb-4 sm:mb-6">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg sm:text-xl font-semibold tracking-tight">Order Items</h2>
+                <button id="add-item" class="bg-restaurant-600 hover:bg-restaurant-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors focus-ring">
+                  + Add Item
+                </button>
+              </div>
+            </header>
+            
+            <div id="order-items" class="space-y-3">
+              <!-- Sample items will be added here -->
+            </div>
+          </section>
+
+          <!-- Service Charges -->
+          <section class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-4 sm:p-6">
+            <header class="mb-4 sm:mb-6">
+              <h2 class="text-lg sm:text-xl font-semibold tracking-tight">Service Charges</h2>
+            </header>
+            
+            <div class="space-y-4">
+              <!-- Tax -->
+              <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <label class="flex items-center gap-2 text-sm font-medium text-slate-700 mb-3">
+                  <input id="toggle-tax" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-restaurant-600 focus:ring-restaurant-500">
+                  Include Tax (%)
+                </label>
+                <div id="tax-wrap" class="hidden">
+                  <div class="grid grid-cols-4 gap-2 mb-3">
+                    <button type="button" data-tax="8" class="tax-btn rounded-lg border border-slate-300 py-2 text-sm font-medium hover:bg-slate-50">8%</button>
+                    <button type="button" data-tax="10" class="tax-btn rounded-lg border border-slate-300 py-2 text-sm font-medium hover:bg-slate-50">10%</button>
+                    <button type="button" data-tax="12" class="tax-btn rounded-lg border border-slate-300 py-2 text-sm font-medium hover:bg-slate-50">12%</button>
+                    <div class="relative">
+                      <input id="tax" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" class="w-full rounded-lg border border-slate-300 py-2 pl-3 pr-8 text-sm focus-ring">
+                      <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-500 text-sm">%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Service Charge -->
+              <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <label class="flex items-center gap-2 text-sm font-medium text-slate-700 mb-3">
+                  <input id="toggle-service" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-restaurant-600 focus:ring-restaurant-500">
+                  Service Charge (%)
+                </label>
+                <div id="service-wrap" class="hidden">
+                  <div class="grid grid-cols-4 gap-2 mb-3">
+                    <button type="button" data-service="5" class="service-btn rounded-lg border border-slate-300 py-2 text-sm font-medium hover:bg-slate-50">5%</button>
+                    <button type="button" data-service="10" class="service-btn rounded-lg border border-slate-300 py-2 text-sm font-medium hover:bg-slate-50">10%</button>
+                    <button type="button" data-service="15" class="service-btn rounded-lg border border-slate-300 py-2 text-sm font-medium hover:bg-slate-50">15%</button>
+                    <div class="relative">
+                      <input id="service" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" class="w-full rounded-lg border border-slate-300 py-2 pl-3 pr-8 text-sm focus-ring">
+                      <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-500 text-sm">%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tip -->
+              <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <label class="flex items-center gap-2 text-sm font-medium text-slate-700 mb-3">
+                  <input id="toggle-tip" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-restaurant-600 focus:ring-restaurant-500">
+                  Additional Tip (%)
+                </label>
+                <div id="tip-wrap" class="hidden">
+                  <div class="grid grid-cols-4 gap-2 mb-3">
+                    <button type="button" data-tip="5" class="tip-btn rounded-lg border border-slate-300 py-2 text-sm font-medium hover:bg-slate-50">5%</button>
+                    <button type="button" data-tip="10" class="tip-btn rounded-lg border border-slate-300 py-2 text-sm font-medium hover:bg-slate-50">10%</button>
+                    <button type="button" data-tip="15" class="tip-btn rounded-lg border border-slate-300 py-2 text-sm font-medium hover:bg-slate-50">15%</button>
+                    <div class="relative">
+                      <input id="tip" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" class="w-full rounded-lg border border-slate-300 py-2 pl-3 pr-8 text-sm focus-ring">
+                      <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-500 text-sm">%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Right Column: Results & People -->
+        <div class="space-y-4 sm:space-y-6">
+          <!-- People Management -->
+          <section class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-4 sm:p-6">
+            <header class="mb-4 sm:mb-6">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg sm:text-xl font-semibold tracking-tight">Diners</h2>
+                <button id="add-person" class="bg-restaurant-600 hover:bg-restaurant-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-ring">
+                  + Add
+                </button>
+              </div>
+            </header>
+            
+            <div class="mb-4">
+              <label for="people-count" class="block text-sm font-medium text-slate-700 mb-2">Number of People</label>
+              <div class="flex items-center gap-2">
+                <button type="button" id="dec-people" class="w-10 h-10 rounded-lg border border-slate-300 hover:bg-slate-50 text-lg">−</button>
+                <input id="people-count" inputmode="numeric" pattern="[0-9]*" value="2" class="flex-1 rounded-lg border border-slate-300 bg-white py-2 px-3 text-sm text-center focus-ring">
+                <button type="button" id="inc-people" class="w-10 h-10 rounded-lg border border-slate-300 hover:bg-slate-50 text-lg">+</button>
+              </div>
+            </div>
+            
+            <div id="diners-list" class="space-y-2">
+              <!-- Diners will be added here -->
+            </div>
+          </section>
+
+          <!-- Bill Summary -->
+          <section class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-4 sm:p-6">
+            <header class="mb-4 sm:mb-6">
+              <h2 class="text-lg sm:text-xl font-semibold tracking-tight">Bill Summary</h2>
+            </header>
+            
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-slate-600">Subtotal</span>
+                <span id="out-subtotal" class="text-sm font-medium">$0.00</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-slate-600">Tax</span>
+                <span id="out-tax" class="text-sm font-medium">$0.00</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-slate-600">Service Charge</span>
+                <span id="out-service" class="text-sm font-medium">$0.00</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-slate-600">Tip</span>
+                <span id="out-tip" class="text-sm font-medium">$0.00</span>
+              </div>
+              <hr class="border-slate-200">
+              <div class="flex items-center justify-between text-base">
+                <span class="font-semibold">Total</span>
+                <span id="out-total" class="font-semibold">$0.00</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Per Person Breakdown -->
+          <section class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-4 sm:p-6">
+            <header class="mb-4 sm:mb-6">
+              <h2 class="text-lg sm:text-xl font-semibold tracking-tight">Per Person</h2>
+            </header>
+            
+            <div id="per-person-breakdown" class="space-y-3">
+              <!-- Per person amounts will be shown here -->
+            </div>
+          </section>
+
+          <!-- Actions -->
+          <section class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-4 sm:p-6">
+            <div class="space-y-3">
+              <button id="share-bill" class="w-full bg-restaurant-600 hover:bg-restaurant-700 text-white font-medium py-3 rounded-xl transition-colors focus-ring flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                </svg>
+                Share Bill
+              </button>
+              
+              <button id="print-bill" class="w-full border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-3 rounded-xl transition-colors focus-ring flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                </svg>
+                Print Bill
+              </button>
+              
+              <button id="reset-all" class="w-full text-slate-600 hover:text-slate-900 font-medium py-2 transition-colors">
+                Reset All
+              </button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Item Modal -->
+  <div id="item-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold text-slate-900">Add Menu Item</h2>
+        <button id="close-item-modal" class="text-slate-400 hover:text-slate-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <form id="item-form" class="space-y-4">
+        <div>
+          <label for="item-name" class="block text-sm font-medium text-slate-700 mb-2">Item Name</label>
+          <input id="item-name" type="text" required class="w-full rounded-xl border border-slate-300 bg-white py-3 px-3 text-sm focus-ring" placeholder="e.g., Grilled Salmon">
+        </div>
+        
+        <div>
+          <label for="item-price" class="block text-sm font-medium text-slate-700 mb-2">Price</label>
+          <div class="relative">
+            <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-500 currency-symbol text-sm">$</span>
+            <input id="item-price" type="number" step="0.01" required class="w-full rounded-xl border border-slate-300 bg-white py-3 pl-8 pr-3 text-sm focus-ring" placeholder="0.00">
+          </div>
+        </div>
+        
+        <div>
+          <label for="item-quantity" class="block text-sm font-medium text-slate-700 mb-2">Quantity</label>
+          <input id="item-quantity" type="number" min="1" value="1" class="w-full rounded-xl border border-slate-300 bg-white py-3 px-3 text-sm focus-ring">
+        </div>
+        
+        <div>
+          <label for="item-category" class="block text-sm font-medium text-slate-700 mb-2">Category</label>
+          <select id="item-category" class="w-full rounded-xl border border-slate-300 bg-white py-3 px-3 text-sm focus-ring">
+            <option value="appetizer">Appetizer</option>
+            <option value="main">Main Course</option>
+            <option value="dessert">Dessert</option>
+            <option value="beverage">Beverage</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Who ordered this?</label>
+          <div id="item-assignees" class="space-y-2">
+            <!-- Assignee checkboxes will be populated here -->
+          </div>
+          <div class="mt-2">
+            <label class="flex items-center gap-2 text-sm text-slate-600">
+              <input type="checkbox" id="item-shared" class="h-4 w-4 rounded border-slate-300 text-restaurant-600 focus:ring-restaurant-500">
+              <span>Shared item (split equally among all diners)</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="flex gap-3 pt-4">
+          <button type="button" id="cancel-item" class="flex-1 border border-slate-300 hover:bg-slate-50 text-slate-700 font-medium py-3 rounded-xl transition-colors">
+            Cancel
+          </button>
+          <button type="submit" class="flex-1 bg-restaurant-600 hover:bg-restaurant-700 text-white font-medium py-3 rounded-xl transition-colors">
+            Add Item
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Share Modal -->
+  <div id="share-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold text-slate-900">Share Restaurant Bill</h2>
+        <button id="close-share-modal" class="text-slate-400 hover:text-slate-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- URL Display -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-slate-700 mb-2">Shareable Link</label>
+        <div class="flex items-center gap-2">
+          <input id="share-url" type="text" readonly class="flex-1 rounded-xl border border-slate-300 bg-slate-50 py-3 px-3 text-sm focus-ring">
+          <button id="copy-url" class="bg-restaurant-600 hover:bg-restaurant-700 text-white p-3 rounded-xl transition-colors focus-ring">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- QR Code -->
+      <div class="text-center">
+        <label class="block text-sm font-medium text-slate-700 mb-3">QR Code</label>
+        <div id="qr-code" class="inline-block p-4 bg-white border border-slate-200 rounded-xl">
+          <!-- QR code will be generated here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="restaurant.js"></script>
+</body>
+</html>
