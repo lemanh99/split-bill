@@ -87,3 +87,7 @@ starlette_config = Config(
         "GOOGLE_CLIENT_SECRET": GOOGLE_CLIENT_SECRET,
     }
 )
+
+# --------------------------- FRONTEND --------------------------------
+FRONTEND_BASE_URI = os.getenv("FRONTEND_BASE_URI", "http://localhost:3000")
+FILE_BASE_URI = os.getenv("FILE_BASE_URI", AWS_S3_ENDPOINT_URL)

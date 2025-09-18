@@ -2,14 +2,16 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
 
 import config
 from api.routers import routers
-from app.common.handlers import base_error_handler, validation_exception_handler
+from app.common.handlers import base_error_handler, validation_exception_handler, sqlalchemy_exception_handler
 from app.common.middlewares.language import LanguageBabelMiddleware
 from core.common.exceptions import BillFasterBaseException
+from web.routers import routers as web_routers
 
 if config.ENVIRONMENT == "pro":
     docs_url, redoc_url, openapi_url = None, None, None
@@ -44,9 +46,11 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_exception_handler(BillFasterBaseException, base_error_handler)
 app.add_exception_handler(ValidationError, validation_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
 app.add_exception_handler(Exception, base_error_handler)
 
-app.mount("/static", config.statics, name="static")
+app.mount("/statics", config.statics, name="static")
+app.include_router(web_routers)
 app.include_router(routers, prefix="/api")
 
 

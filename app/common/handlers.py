@@ -2,6 +2,7 @@ import logging
 from http import HTTPStatus
 
 from fastapi.exceptions import RequestValidationError
+from sqlalchemy.exc import SQLAlchemyError
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
@@ -46,3 +47,15 @@ def validation_exception_handler(request: Request, exception: RequestValidationE
             errs.append({err["loc"][0]: err.get("msg")})
 
     return JSONResponse(status_code=400, content={"errors": errs})
+
+
+def sqlalchemy_exception_handler(request: Request, exception: SQLAlchemyError):
+    logger.exception(msg=f"SQLAlchemy error: {request.url}", exc_info=exception)
+
+    return JSONResponse(
+        status_code=HTTPStatus.BAD_REQUEST,
+        content={
+            "status_code": HTTPStatus.BAD_REQUEST,
+            "errors": "Bad request!",
+        },
+    )
