@@ -7,6 +7,7 @@ from app.common.constants import BillType, BillShareType
 
 
 class BillParticipantCrUpSchema(BaseModel):
+    name: str | None = Field(default=None, max_length=100)
     amount: Decimal = Field(...)
     email: str | None = Field(default=None)
     description: str | None = Field(default=None)

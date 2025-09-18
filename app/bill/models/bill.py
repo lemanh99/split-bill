@@ -57,6 +57,7 @@ class BillParticipant(BillFasterBaseModel):
 
     bill_id = Column(ForeignKey("t_bills.id"), nullable=False, index=True)
     bill_item_id = Column(ForeignKey("t_bill_items.id"), nullable=True, index=True)
+    name = Column(String(length=100), nullable=True)
     amount = Column(Numeric(16, 2), nullable=False)
     email = Column(String(length=255), nullable=True)
     description = Column(String(length=255), nullable=True)
