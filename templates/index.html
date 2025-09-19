@@ -23,12 +23,33 @@
                 <a href="#" class="text-slate-600 hover:text-slate-900 px-3 py-2 text-sm font-medium">About</a>
             </div>
 
-            <!-- Desktop Login Button -->
+            <!-- Desktop Login Button / User Menu -->
             <div class="hidden md:flex items-center space-x-4">
                 <button id="login-btn"
                         class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors focus-ring">
                     Login
                 </button>
+                
+                <!-- User Menu -->
+                <div id="user-menu" class="hidden items-center space-x-3">
+                    <div class="flex items-center space-x-2">
+                        <img id="user-avatar" class="w-8 h-8 rounded-full hidden" alt="User Avatar">
+                        <span id="user-name" class="text-sm font-medium text-slate-700"></span>
+                    </div>
+                    <div class="relative">
+                        <button id="user-menu-btn" class="flex items-center space-x-1 text-slate-600 hover:text-slate-900">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg ring-1 ring-slate-200 py-1 z-50">
+                            <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">Profile</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">Settings</a>
+                            <hr class="my-1">
+                            <button onclick="logout()" class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">Logout</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Mobile Menu Button -->
@@ -37,6 +58,7 @@
                         class="bg-brand-600 hover:bg-brand-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-ring">
                     Login
                 </button>
+                
                 <button id="mobile-menu-btn"
                         class="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus-ring">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,6 +78,17 @@
                    class="block px-3 py-2 text-slate-600 hover:text-slate-900 text-sm font-medium">Restaurant</a>
                 <a href="#" class="block px-3 py-2 text-slate-600 hover:text-slate-900 text-sm font-medium">History</a>
                 <a href="#" class="block px-3 py-2 text-slate-600 hover:text-slate-900 text-sm font-medium">About</a>
+                
+                <!-- Mobile User Info & Logout (hidden by default) -->
+                <div id="mobile-user-section" class="hidden border-t border-slate-200 pt-2 mt-2">
+                    <div class="flex items-center space-x-2 px-3 py-2">
+                        <img id="mobile-menu-user-avatar" class="w-6 h-6 rounded-full hidden" alt="User Avatar">
+                        <span id="mobile-menu-user-name" class="text-sm font-medium text-slate-700"></span>
+                    </div>
+                    <button onclick="logout()" class="block w-full text-left px-3 py-2 text-slate-600 hover:text-slate-900 text-sm font-medium">
+                        Logout
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
@@ -559,59 +592,13 @@
 </div>
 
 <script src="/statics/assets/js/app.js"></script>
+<script src="/statics/assets/js/auth.js"></script>
 <script>
-    const API_BASE = '{{ configs.fe_base_uri }}';
-    const CALLBACK_URL = encodeURIComponent('{{ configs.google_auth_callback_url }}');
-    function getQueryParams() {
-        const params = new URLSearchParams(window.location.search);
-        return {
-            code: params.get('code'),
-            state: params.get('state'),
-            redirect_uri: params.get('redirect_uri')
-        };
-    }
-    async function exchangeTokenWithQuery() {
-        try {
-            let qs = window.location.search || '';
-            if (!qs) return false;
-            const separator = qs.includes('?') ? '&' : '?';
-            const url = `${API_BASE}/api/auth/google-sign-in/token${qs}${separator}redirect_uri=${CALLBACK_URL}`;
-            const resp = await fetch(url, {
-                method: 'GET',
-                headers: {'accept': 'application/json'}
-            });
-            if (!resp.ok) throw new Error('Token exchange failed');
-            const data = await resp.json();
-            const token = data?.data;
-            // Expecting { access_token, refresh_token, ... }
-            if (token?.access_token) {
-                localStorage.setItem('access_token', token.access_token);
-            }
-            if (token?.refresh_token) {
-                localStorage.setItem('refresh_token', token.refresh_token);
-            }
-            // Redirect to main page after successful login
-            window.location.href = '/';
-            return true;
-        } catch (e) {
-            console.error(e);
-            document.getElementById('status').textContent = 'Login failed. Please try again.';
-            window.location.href = '/';
-            return false;
-        }
-    }
-
-    // If redirected back with code/state, perform token exchange immediately
-    (async () => {
-        const {code, state} = getQueryParams();
-        console.log(code, state);
-        if (code && state) {
-            const statusEl = document.getElementById('status');
-            if (statusEl) statusEl.textContent = 'Completing sign-in...';
-            await exchangeTokenWithQuery();
-        }
-    })();
-
+    window.AUTH_CONFIG = {
+        API_BASE: '{{ configs.fe_base_uri }}',
+        CALLBACK_URL: encodeURIComponent('{{ configs.google_auth_callback_url }}')
+    };
+    window.Auth?.initAuth?.();
 </script>
 </body>
 </html>
