@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -14,6 +16,8 @@ class AuthSignUpSchema(BaseModel):
     password: str
     email: str
     full_name: str
+    birthday: datetime | None = None
+    avatar: str | None = None
 
     class Config:
         json_schema_extra = {

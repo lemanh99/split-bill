@@ -12,7 +12,6 @@ router = APIRouter(
     prefix="/auth", tags=["auth"], responses={404: {"description": "Not found"}}
 )
 
-
 @router.post("/sign-in")
 async def sign_in(
     user: AuthLoginSchema,
@@ -37,8 +36,7 @@ async def google_auth_token(
 ):
     service = AuthService(db_session)
     result = await service.oauth_sign_in(SocialProvider.GOOGLE, request)
-
-    return result
+    return make_success_response(result)
 
 
 @router.post("/sign-out")

@@ -18,11 +18,13 @@ class UserProfile(BillFasterBaseModel):
 
     user_id = Column(ForeignKey("t_users.user_id"), nullable=False, unique=True)
     full_name = Column(String(length=255), nullable=False)
+    birthday = Column(DateTime, default=None, nullable=True)
+    avatar = Column(Text(), default=None, nullable=True)
 
 
 class AuthToken(BillFasterBaseModel):
     __tablename__ = "t_auth_token"
 
     token = Column(Text())
-    user_id = Column(String(length=15))
+    user_id = Column(String(length=255))
     expires_at = Column(DateTime, default=None, nullable=True)

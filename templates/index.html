@@ -15,10 +15,10 @@
 
             <!-- Desktop Navigation Links -->
             <div class="hidden md:flex items-center space-x-8">
-                <a href="index.html"
+                <a href="/"
                    class="text-brand-600 hover:text-brand-700 px-3 py-2 text-sm font-medium border-b-2 border-brand-600">Simple
                     Split</a>
-                <a href="restaurant.html" class="text-slate-600 hover:text-slate-900 px-3 py-2 text-sm font-medium">Restaurant</a>
+                <a href="#" class="text-slate-600 hover:text-slate-900 px-3 py-2 text-sm font-medium">Restaurant</a>
                 <a href="#" class="text-slate-600 hover:text-slate-900 px-3 py-2 text-sm font-medium">History</a>
                 <a href="#" class="text-slate-600 hover:text-slate-900 px-3 py-2 text-sm font-medium">About</a>
             </div>
@@ -559,7 +559,60 @@
 </div>
 
 <script src="/statics/assets/js/app.js"></script>
+<script>
+    const API_BASE = '{{ configs.fe_base_uri }}';
+    const CALLBACK_URL = encodeURIComponent('{{ configs.google_auth_callback_url }}');
+    function getQueryParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            code: params.get('code'),
+            state: params.get('state'),
+            redirect_uri: params.get('redirect_uri')
+        };
+    }
+    async function exchangeTokenWithQuery() {
+        try {
+            let qs = window.location.search || '';
+            if (!qs) return false;
+            const separator = qs.includes('?') ? '&' : '?';
+            const url = `${API_BASE}/api/auth/google-sign-in/token${qs}${separator}redirect_uri=${CALLBACK_URL}`;
+            const resp = await fetch(url, {
+                method: 'GET',
+                headers: {'accept': 'application/json'}
+            });
+            if (!resp.ok) throw new Error('Token exchange failed');
+            const data = await resp.json();
+            const token = data?.data;
+            // Expecting { access_token, refresh_token, ... }
+            if (token?.access_token) {
+                localStorage.setItem('access_token', token.access_token);
+            }
+            if (token?.refresh_token) {
+                localStorage.setItem('refresh_token', token.refresh_token);
+            }
+            // Redirect to main page after successful login
+            window.location.href = '/';
+            return true;
+        } catch (e) {
+            console.error(e);
+            document.getElementById('status').textContent = 'Login failed. Please try again.';
+            window.location.href = '/';
+            return false;
+        }
+    }
 
+    // If redirected back with code/state, perform token exchange immediately
+    (async () => {
+        const {code, state} = getQueryParams();
+        console.log(code, state);
+        if (code && state) {
+            const statusEl = document.getElementById('status');
+            if (statusEl) statusEl.textContent = 'Completing sign-in...';
+            await exchangeTokenWithQuery();
+        }
+    })();
+
+</script>
 </body>
 </html>
 

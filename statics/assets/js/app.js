@@ -561,7 +561,8 @@
       compute();
     });
   }
-  shareBtn.addEventListener('click', async (e) => {
+  // Public share button
+  document.getElementById('share-public')?.addEventListener('click', async (e) => {
     e.preventDefault();
     try {
       const r = compute();
@@ -575,7 +576,7 @@
       const payload = {
         bill_file_id: typeof billFileId === 'number' ? billFileId : null,
         type: 1,
-        share_type: 2,
+        share_type: 2, // PUBLIC
         subtotal: Number(r.subtotal.toFixed(decimals)),
         tax_flag: !!(document.getElementById('toggle-tax')?.checked),
         tax_percent: (document.getElementById('toggle-tax')?.checked && String(document.getElementById('tax')?.value || '').trim() !== '') ? Number((document.getElementById('tax')?.value || '0')) : 0,
@@ -605,6 +606,61 @@
     } catch (err) {
       console.error(err);
       showNotification('Failed to create bill. Please try again.', 'error');
+    }
+  });
+
+  // Private share button (requires access token)
+  document.getElementById('share-private')?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const token = getAccessToken();
+    if (!token) {
+      // Open confirm modal instead of immediate redirect
+      const modal = document.getElementById('confirm-login-modal');
+      if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+      return;
+    }
+    try {
+      const r = compute();
+      const decimals = getCurrencyDecimals();
+      const bill_items = [];
+      const bill_participants = r.perList.map(p => ({
+        amount: Number(p.owed.toFixed(decimals)),
+        email: p.email || null,
+        description: p.note || null,
+      }));
+      const payload = {
+        bill_file_id: typeof billFileId === 'number' ? billFileId : null,
+        type: 1,
+        share_type: 1, // PRIVATE
+        subtotal: Number(r.subtotal.toFixed(decimals)),
+        tax_flag: !!(document.getElementById('toggle-tax')?.checked),
+        tax_percent: (document.getElementById('toggle-tax')?.checked && String(document.getElementById('tax')?.value || '').trim() !== '') ? Number((document.getElementById('tax')?.value || '0')) : 0,
+        tax_amount: Number(r.taxAmount.toFixed(decimals)),
+        tip_flag: !!(document.getElementById('toggle-tip')?.checked),
+        tip_percent: (document.getElementById('toggle-tip')?.checked && String(document.getElementById('tip')?.value || '').trim() !== '') ? Number((document.getElementById('tip')?.value || '0')) : 0,
+        tip_amount: Number(r.tipAmount.toFixed(decimals)),
+        total: Number(r.total.toFixed(decimals)),
+        currency: document.getElementById('currency')?.value || 'USD',
+        number_people: r.people,
+        payment_flag: (document.getElementById('payment-methods-toggle')?.checked) || false,
+        payment_method: 0,
+        payment_note: null,
+        payment_file_id: typeof paymentFileId === 'number' ? paymentFileId : null,
+        bill_items,
+        bill_participants,
+      };
+      const data = await apiCreateBill(payload);
+      const billNumber = data?.bill_number;
+      if (!billNumber) throw new Error('No bill number');
+      const shareUrl = `${window.location.origin}/api/bill/${encodeURIComponent(billNumber)}`;
+      document.getElementById('share-url').value = shareUrl;
+      generateQRCode(shareUrl);
+      const shareModal = document.getElementById('share-modal');
+      shareModal.classList.remove('hidden');
+      shareModal.classList.add('flex');
+    } catch (err) {
+      console.error(err);
+      showNotification('Failed to create private bill. Please try again.', 'error');
     }
   });
 
@@ -1177,36 +1233,36 @@ const loginModal = document.getElementById('login-modal');
 const closeModal = document.getElementById('close-modal');
 const loginForm = document.getElementById('login-form');
 
-// Show login modal (desktop)
+// Desktop login button: redirect to login.html if not logged in; else logout
 loginBtn?.addEventListener('click', () => {
-  if (loginBtn.textContent === 'Logout') {
-    // Handle logout
-    loginBtn.textContent = 'Login';
-    loginBtn.classList.remove('bg-slate-600', 'hover:bg-slate-700');
-    loginBtn.classList.add('bg-brand-600', 'hover:bg-brand-700');
-    console.log('Logged out');
+  const token = localStorage.getItem('access_token');
+  if (!token) {
+    window.location.href = '/login';
     return;
   }
-  
-  // Show login modal
-  loginModal.classList.remove('hidden');
-  loginModal.classList.add('flex');
+  // If already logged in, treat as logout
+  loginBtn.textContent = 'Login';
+  loginBtn.classList.remove('bg-slate-600', 'hover:bg-slate-700');
+  loginBtn.classList.add('bg-brand-600', 'hover:bg-brand-700');
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  console.log('Logged out');
 });
 
-// Show login modal (mobile)
+// Mobile login button: redirect to login.html if not logged in; else logout
 mobileLoginBtn?.addEventListener('click', () => {
-  if (mobileLoginBtn.textContent === 'Logout') {
-    // Handle logout
-    mobileLoginBtn.textContent = 'Login';
-    mobileLoginBtn.classList.remove('bg-slate-600', 'hover:bg-slate-700');
-    mobileLoginBtn.classList.add('bg-brand-600', 'hover:bg-brand-700');
-    console.log('Logged out');
+  const token = localStorage.getItem('access_token');
+  if (!token) {
+    window.location.href = '/login';
     return;
   }
-  
-  // Show login modal
-  loginModal.classList.remove('hidden');
-  loginModal.classList.add('flex');
+  // If already logged in, treat as logout
+  mobileLoginBtn.textContent = 'Login';
+  mobileLoginBtn.classList.remove('bg-slate-600', 'hover:bg-slate-700');
+  mobileLoginBtn.classList.add('bg-brand-600', 'hover:bg-brand-700');
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  console.log('Logged out');
 });
 
 // Hide login modal
@@ -1253,5 +1309,23 @@ loginForm?.addEventListener('submit', (e) => {
     console.log('Login successful:', { email, password });
   }
 });
+
+  // Confirm Login modal bindings
+  const confirmLoginModal = document.getElementById('confirm-login-modal');
+  const confirmLoginClose = document.getElementById('confirm-login-close');
+  const confirmLoginCancel = document.getElementById('confirm-login-cancel');
+  const confirmLoginContinue = document.getElementById('confirm-login-continue');
+
+  confirmLoginClose?.addEventListener('click', () => {
+    confirmLoginModal?.classList.add('hidden');
+    confirmLoginModal?.classList.remove('flex');
+  });
+  confirmLoginCancel?.addEventListener('click', () => {
+    confirmLoginModal?.classList.add('hidden');
+    confirmLoginModal?.classList.remove('flex');
+  });
+  confirmLoginContinue?.addEventListener('click', () => {
+    window.location.href = '/login';
+  });
 
 

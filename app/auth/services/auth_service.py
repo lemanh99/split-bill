@@ -59,6 +59,7 @@ class AuthService(BillFasterBaseService):
         if provider.GOOGLE:
             try:
                 params = {
+                    "grant_type": "authorization_code",
                     "code": request.query_params.get("code"),
                     "state": request.query_params.get("state"),
                     "redirect_uri": request.query_params.get("redirect_uri"),
@@ -86,11 +87,15 @@ class AuthService(BillFasterBaseService):
                     user_id=str(uuid.uuid4()),
                     password=str(uuid.uuid4()),
                     email=auth_email,
-                    full_name=userinfo.get("full_name"),
+                    full_name=userinfo.get("name"),
+                    birthday=None,
+                    avatar=userinfo.get("picture", ""),
                 )
             )
 
-        return await self.auth_generate_token(user)
+        token = await self.auth_generate_token(user)
+        await self.db_session.commit()
+        return token
 
     async def sign_in(self, user_id, password):
         user = await self.get_user_by_id(user_id)
@@ -104,7 +109,7 @@ class AuthService(BillFasterBaseService):
                 message=_("There is an error in your ID or password!")
             )
 
-        return self.auth_generate_token(user)
+        return await self.auth_generate_token(user)
 
     async def sign_out(self, user_id):
         user = await self.get_user_by_id(user_id)
@@ -135,11 +140,16 @@ class AuthService(BillFasterBaseService):
         if token_mngr is None:
             raise BillFasterUnAuthenticatedException()
 
+        user_profile = await self.get_user_profile_by_user_id(user.user_id)
         return {
             "id": user.id,
             "user_id": user.user_id,
             "email": user.email,
-            "user_name": user.user_name,
+            "profile": {
+                "full_name": user_profile.full_name if user_profile else None,
+                "birthday": user_profile.birthday if user_profile else None,
+                "avatar": user_profile.avatar if user_profile else None,
+            },
             "role": user.role,
         }
 
@@ -150,18 +160,13 @@ class AuthService(BillFasterBaseService):
         if not token_mngr:
             raise BillFasterUnAuthenticatedException()
 
-        if token_mngr.expires_at < datetime.datetime.utcnow():
-            delete_statement = delete(AuthToken).where(
-                AuthToken.user_id == token_mngr.user_id
+        user = await self.get_user_by_id(token_mngr.user_id)
+        if not user:
+            raise BillFasterBadRequestException(
+                message=_("User not found or has been deleted.")
             )
-            await self.db_session.execute(delete_statement)
-            raise BillFasterUnAuthenticatedException()
 
-        access_token, _ = create_token(
-            subject=token_mngr.user_id,
-            token_type=TokenType.ACCESS_TOKEN,
-        )
-        return {"access_token": access_token, "refresh_token": refresh_token}
+        return await self.auth_generate_token(user)
 
     async def get_user_by_id(self, user_id: str) -> User:
         query = select(User).filter(User.user_id == user_id, User.deleted_at == None)
@@ -172,6 +177,11 @@ class AuthService(BillFasterBaseService):
         query = select(User).filter(User.email == email, User.deleted_at == None)
         query_set = await self.db_session.execute(query)
         return query_set.scalars().one()
+
+    async def get_user_profile_by_user_id(self, user_id: str) -> UserProfile:
+        query = select(UserProfile).filter(UserProfile.user_id == user_id)
+        query_set = await self.db_session.execute(query)
+        return query_set.scalars().first()
 
     async def get_token_mngr_by_user_id(self, user_id: str):
         query = select(AuthToken).filter(AuthToken.user_id == user_id)
@@ -189,7 +199,9 @@ class AuthService(BillFasterBaseService):
         user_profile = UserProfile(
             user_id=user.user_id,
             full_name=user_schema.full_name,
+            birthday=user_schema.birthday,
+            avatar=user_schema.avatar,
         )
         self.db_session.add(user_profile)
-        await self.db_session.commit()
+        await self.db_session.flush()
         return user

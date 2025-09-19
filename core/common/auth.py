@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
-from typing import Union, Any, Tuple
+from typing import Union, Any
+
 from fastapi_babel import _
 from jose import jwt
 from passlib.context import CryptContext
