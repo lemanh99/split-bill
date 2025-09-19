@@ -123,18 +123,18 @@
                 <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1.5 sm:mb-2">Upload Bill
                     (Optional)</label>
                 <div id="upload-area"
-                     class="relative border-2 border-dashed border-slate-300 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center hover:border-brand-400 transition-colors cursor-pointer">
-                    <input type="file" id="bill-upload" accept="image/*,.pdf"
+                     class="relative border-2 border-dashed border-slate-300 rounded-lg p-2 text-center hover:border-brand-400 transition-colors cursor-pointer">
+                    <input type="file" id="bill-upload" accept="image/*,.pdf" multiple="false"
                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                    <div class="flex flex-col items-center gap-1.5 sm:gap-2">
-                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-slate-400" fill="none" stroke="currentColor"
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor"
                              viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                         </svg>
-                        <div>
-                            <p class="text-xs font-medium text-slate-700">Click to upload or drag and drop</p>
-                            <p class="text-xs text-slate-500">PNG, JPG, PDF up to 10MB</p>
+                        <div class="text-left">
+                            <p class="text-xs font-medium text-slate-700">Upload bill</p>
+                            <p class="text-xs text-slate-500">PNG, JPG, PDF (1 file)</p>
                         </div>
                     </div>
                 </div>
@@ -191,7 +191,8 @@
                             Include tax (%)
                         </label>
                         <div id="tax-wrap" class="mt-2 hidden">
-                            <div class="grid grid-cols-3 sm:grid-cols-4 gap-1.5 sm:gap-2">
+                            <!-- Percentage buttons row -->
+                            <div class="grid grid-cols-3 gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
                                 <button type="button" data-tax="1"
                                         class="tax-btn rounded-lg sm:rounded-xl border border-slate-300 py-2 sm:py-2.5 text-xs sm:text-sm font-medium hover:bg-slate-50">
                                     1%
@@ -204,7 +205,10 @@
                                         class="tax-btn rounded-lg sm:rounded-xl border border-slate-300 py-2 sm:py-2.5 text-xs sm:text-sm font-medium hover:bg-slate-50">
                                     5%
                                 </button>
-                                <div class="relative sm:col-span-1 col-span-1">
+                            </div>
+                            <!-- Percentage input and Amount input row -->
+                            <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
+                                <div class="relative">
                                     <input id="tax" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*"
                                            class="w-full rounded-lg sm:rounded-xl border border-slate-300 py-2 sm:py-2.5 pl-2 sm:pl-3 pr-6 sm:pr-7 text-xs sm:text-sm focus-ring">
                                     <span class="pointer-events-none absolute inset-y-0 right-3 sm:right-4 flex items-center text-slate-500 text-xs sm:text-sm">%</span>
@@ -225,12 +229,12 @@
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="mt-1.5 sm:mt-2 relative">
-                                <span class="pointer-events-none absolute inset-y-0 left-2.5 sm:left-3 flex items-center text-slate-500 currency-symbol text-xs sm:text-sm">$</span>
-                                <input id="tax-amount" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*"
-                                       placeholder="0.00"
-                                       class="tax-amount-input amount-input w-full rounded-lg sm:rounded-xl border border-slate-300 bg-white py-2 sm:py-3 pl-6 sm:pl-8 pr-3 text-xs sm:text-sm focus-ring"/>
+                                <div class="relative col-span-2">
+                                    <span class="pointer-events-none absolute inset-y-0 left-2.5 sm:left-3 flex items-center text-slate-500 currency-symbol text-xs sm:text-sm">$</span>
+                                    <input id="tax-amount" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*"
+                                           placeholder="0.00"
+                                           class="tax-amount-input amount-input w-full rounded-lg sm:rounded-xl border border-slate-300 bg-white py-2 sm:py-2.5 pl-6 sm:pl-8 pr-3 text-xs sm:text-sm focus-ring"/>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -241,7 +245,8 @@
                             Include tip (%)
                         </label>
                         <div id="tip-wrap" class="mt-2 hidden">
-                            <div class="grid grid-cols-3 sm:grid-cols-4 gap-1.5 sm:gap-2">
+                            <!-- Percentage buttons row -->
+                            <div class="grid grid-cols-3 gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
                                 <button type="button" data-tip="5"
                                         class="tip-btn rounded-lg sm:rounded-xl border border-slate-300 py-2 sm:py-2.5 text-xs sm:text-sm font-medium hover:bg-slate-50">
                                     5%
@@ -254,7 +259,10 @@
                                         class="tip-btn rounded-lg sm:rounded-xl border border-slate-300 py-2 sm:py-2.5 text-xs sm:text-sm font-medium hover:bg-slate-50">
                                     15%
                                 </button>
-                                <div class="relative sm:col-span-1 col-span-1">
+                            </div>
+                            <!-- Percentage input and Amount input row -->
+                            <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
+                                <div class="relative">
                                     <input id="tip" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*"
                                            class="w-full rounded-lg sm:rounded-xl border border-slate-300 py-2 sm:py-2.5 pl-2 sm:pl-3 pr-6 sm:pr-7 text-xs sm:text-sm focus-ring">
                                     <span class="pointer-events-none absolute inset-y-0 right-3 sm:right-4 flex items-center text-slate-500 text-xs sm:text-sm">%</span>
@@ -275,12 +283,12 @@
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="mt-1.5 sm:mt-2 relative">
-                                <span class="pointer-events-none absolute inset-y-0 left-2.5 sm:left-3 flex items-center text-slate-500 currency-symbol text-xs sm:text-sm">$</span>
-                                <input id="tip-amount" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*"
-                                       placeholder="0.00"
-                                       class="tip-amount-input amount-input w-full rounded-lg sm:rounded-xl border border-slate-300 bg-white py-2 sm:py-3 pl-6 sm:pl-8 pr-3 text-xs sm:text-sm focus-ring"/>
+                                <div class="relative col-span-2">
+                                    <span class="pointer-events-none absolute inset-y-0 left-2.5 sm:left-3 flex items-center text-slate-500 currency-symbol text-xs sm:text-sm">$</span>
+                                    <input id="tip-amount" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*"
+                                           placeholder="0.00"
+                                           class="tip-amount-input amount-input w-full rounded-lg sm:rounded-xl border border-slate-300 bg-white py-2 sm:py-2.5 pl-6 sm:pl-8 pr-3 text-xs sm:text-sm focus-ring"/>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -404,19 +412,18 @@
                                     QR Code Payment
                                 </label>
                                 <div id="qr-payment-upload" class="mt-2 sm:mt-3 hidden">
-                                    <div class="relative border-2 border-dashed border-slate-300 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center hover:border-brand-400 transition-colors cursor-pointer">
-                                        <input type="file" id="qr-payment-file" accept="image/*"
+                                    <div class="relative border-2 border-dashed border-slate-300 rounded-lg p-2 text-center hover:border-brand-400 transition-colors cursor-pointer">
+                                        <input type="file" id="qr-payment-file" accept="image/*" multiple="false"
                                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                                        <div class="flex flex-col items-center gap-1.5 sm:gap-2">
-                                            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-slate-400" fill="none"
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-slate-400" fill="none"
                                                  stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                       d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                                             </svg>
-                                            <div>
-                                                <p class="text-xs sm:text-sm font-medium text-slate-700">Upload QR Code
-                                                    for payment</p>
-                                                <p class="text-xs text-slate-500 mt-0.5 sm:mt-1">PNG, JPG up to 5MB</p>
+                                            <div class="text-left">
+                                                <p class="text-xs font-medium text-slate-700">Upload QR Code</p>
+                                                <p class="text-xs text-slate-500">PNG, JPG only (1 image)</p>
                                             </div>
                                         </div>
                                     </div>

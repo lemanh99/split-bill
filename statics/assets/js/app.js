@@ -702,13 +702,23 @@
   });
 
   function handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    
+    // Only process the first file if multiple are selected
+    const file = files[0];
+    
+    // Clear any existing file first
+    uploadedFile = null;
+    billFileId = null;
+    uploadPreviewEl.classList.add('hidden');
+    processingStatusEl.classList.add('hidden');
 
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf'];
     if (!allowedTypes.includes(file.type)) {
       alert('Please upload a valid image (PNG, JPG, GIF) or PDF file.');
+      billUploadEl.value = '';
       return;
     }
 
@@ -716,6 +726,7 @@
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
       alert('File size must be less than 10MB.');
+      billUploadEl.value = '';
       return;
     }
 
@@ -881,65 +892,78 @@
   });
 
   qrPaymentFile?.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      console.log('File selected:', file.name, file.type, file.size);
-      
-      // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-      if (!allowedTypes.includes(file.type)) {
-        alert('Please upload a valid image file (PNG, JPG, GIF).');
-        return;
-      }
-
-      // Validate file size (5MB limit)
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        alert('File size must be less than 5MB.');
-        return;
-      }
-
-      // Upload to backend to get payment_file_id
-      try {
-        const uploaded = await apiUploadFile(file);
-        paymentFileId = uploaded?.id ?? null;
-      } catch (e) {
-        showNotification('QR image upload failed. You can still proceed.', 'error');
-      }
-
-      // Create FileReader to display image
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        console.log('FileReader loaded, setting image src');
-        const qrPaymentImage = document.getElementById('qr-payment-image');
-        const qrPaymentPreview = document.getElementById('qr-payment-preview');
-        const qrPaymentUpload = document.getElementById('qr-payment-upload');
-        
-        if (qrPaymentImage && qrPaymentPreview && qrPaymentUpload) {
-          qrPaymentImage.src = event.target.result;
-          qrPaymentPreview.classList.remove('hidden');
-          // Hide upload area when image is displayed
-          qrPaymentUpload.classList.add('hidden');
-          
-          console.log('Image preview should be visible now');
-          console.log('Image src set to:', qrPaymentImage.src.substring(0, 50) + '...');
-          console.log('Preview element classes:', qrPaymentPreview.className);
-          console.log('Upload element classes:', qrPaymentUpload.className);
-          console.log('Image element classes:', qrPaymentImage.className);
-        } else {
-          console.error('Missing elements:', {
-            qrPaymentImage: !!qrPaymentImage,
-            qrPaymentPreview: !!qrPaymentPreview,
-            qrPaymentUpload: !!qrPaymentUpload
-          });
-        }
-      };
-      reader.onerror = (error) => {
-        console.error('FileReader error:', error);
-        alert('Error reading file. Please try again.');
-      };
-      reader.readAsDataURL(file);
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    // Only process the first file if multiple are selected
+    const file = files[0];
+    
+    // Clear any existing QR payment file first
+    paymentFileId = null;
+    const qrPaymentPreview = document.getElementById('qr-payment-preview');
+    const qrPaymentUpload = document.getElementById('qr-payment-upload');
+    
+    if (qrPaymentPreview) qrPaymentPreview.classList.add('hidden');
+    if (qrPaymentUpload) qrPaymentUpload.classList.remove('hidden');
+    
+    console.log('File selected:', file.name, file.type, file.size);
+    
+    // Validate file type - only images allowed
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Please upload a valid image file (PNG, JPG, GIF only).');
+      qrPaymentFile.value = '';
+      return;
     }
+
+    // Validate file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      alert('File size must be less than 5MB.');
+      qrPaymentFile.value = '';
+      return;
+    }
+
+    // Upload to backend to get payment_file_id
+    try {
+      const uploaded = await apiUploadFile(file);
+      paymentFileId = uploaded?.id ?? null;
+    } catch (e) {
+      showNotification('QR image upload failed. You can still proceed.', 'error');
+    }
+
+    // Create FileReader to display image
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      console.log('FileReader loaded, setting image src');
+      const qrPaymentImage = document.getElementById('qr-payment-image');
+      const qrPaymentPreview = document.getElementById('qr-payment-preview');
+      const qrPaymentUpload = document.getElementById('qr-payment-upload');
+      
+      if (qrPaymentImage && qrPaymentPreview && qrPaymentUpload) {
+        qrPaymentImage.src = event.target.result;
+        qrPaymentPreview.classList.remove('hidden');
+        // Hide upload area when image is displayed
+        qrPaymentUpload.classList.add('hidden');
+        
+        console.log('Image preview should be visible now');
+        console.log('Image src set to:', qrPaymentImage.src.substring(0, 50) + '...');
+        console.log('Preview element classes:', qrPaymentPreview.className);
+        console.log('Upload element classes:', qrPaymentUpload.className);
+        console.log('Image element classes:', qrPaymentImage.className);
+      } else {
+        console.error('Missing elements:', {
+          qrPaymentImage: !!qrPaymentImage,
+          qrPaymentPreview: !!qrPaymentPreview,
+          qrPaymentUpload: !!qrPaymentUpload
+        });
+      }
+    };
+    reader.onerror = (error) => {
+      console.error('FileReader error:', error);
+      alert('Error reading file. Please try again.');
+    };
+    reader.readAsDataURL(file);
   });
 
   removeQrPayment?.addEventListener('click', () => {
@@ -1152,7 +1176,6 @@
       compute();
     }
   });
-})();
 
 // Share Modal functionality
 const shareModal = document.getElementById('share-modal');
@@ -1328,4 +1351,4 @@ loginForm?.addEventListener('submit', (e) => {
     window.location.href = '/login';
   });
 
-
+})();

@@ -59,6 +59,6 @@ app.include_router(web_routers)
 app.include_router(routers, prefix="/api")
 
 
-@app.exception_handler(404)
-async def custom_404_handler(request: Request, exc: Exception):
-    return RedirectResponse(url="/not-found")
+# @app.exception_handler(404)
+# async def custom_404_handler(request: Request, exc: Exception):
+#     return RedirectResponse(url="/not-found")
