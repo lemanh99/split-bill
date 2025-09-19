@@ -71,7 +71,7 @@ Sitemap: https://splitbillfaster.com/sitemap.xml"""
 async def ads_page(
     request: Request,
 ):
-    file_path = os.path.join("static", "ads.txt")
+    file_path = os.path.join("statics", "ads.txt")
     return FileResponse(file_path, media_type="text/plain")
 
 
@@ -80,7 +80,7 @@ async def favicon_page(
     request: Request,
 ):
     """Favicon with proper headers to avoid Service Worker caching"""
-    path = os.path.join("static", "assets", "image", "favicon.ico")
+    path = os.path.join("statics", "assets", "image", "favicon.ico")
     return FileResponse(path, media_type="image/x-icon")
 
 
@@ -90,7 +90,7 @@ async def privacy_policy_page(
 ):
     """Privacy Policy page"""
     return config.templates.TemplateResponse(
-        "privacy-policy.html",
+        "privacy_policy.html",
         {
             "request": request,
             "configs": {
@@ -129,18 +129,6 @@ async def get_sitemap():
 
     primary_urls = [
         {"path": "", "lastmod": date_now, "changefreq": "daily", "priority": 1.0},
-        {
-            "path": "/login",
-            "lastmod": date_now,
-            "changefreq": "monthly",
-            "priority": 0.6,
-        },
-        {
-            "path": "/blog",
-            "lastmod": date_now,
-            "changefreq": "weekly",
-            "priority": 0.8,
-        },
         {
             "path": "/about",
             "lastmod": "2025-07-06",
