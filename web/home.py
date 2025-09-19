@@ -37,7 +37,7 @@ async def home_page(
     )
 
 
-@home_routers.get("/share/{bill_number}")
+@home_routers.get("/bill/share/{bill_number}")
 async def share_bill_page(
     request: Request,
     bill_number: str,

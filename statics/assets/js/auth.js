@@ -1,8 +1,22 @@
 ;(function () {
   const getConfig = () => {
     const cfg = (window.AUTH_CONFIG || {});
+    
+    // Get domain from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const domain = urlParams.get('domain');
+    
+    let apiBase;
+    if (domain) {
+      // If domain parameter exists, use it
+      apiBase = `http://${domain}`;
+    } else {
+      // Fallback to config or current origin
+      apiBase = cfg.API_BASE || (window.location.origin);
+    }
+    
     return {
-      API_BASE: cfg.API_BASE || (window.location.origin),
+      API_BASE: apiBase,
       CALLBACK_URL: cfg.CALLBACK_URL || encodeURIComponent(window.location.origin)
     };
   };

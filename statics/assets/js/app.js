@@ -42,7 +42,6 @@
   const allocationWarning = document.getElementById('allocation-warning');
   let participantsEverEdited = false;
   // --- API integration helpers ---
-  const API_BASE = (window.API_BASE) || 'http://127.0.0.1:8000/api';
   async function apiUploadFile(file) {
     const formData = new FormData();
     formData.append('file', file, file.name);
@@ -571,6 +570,7 @@
       const bill_participants = r.perList.map(p => ({
         amount: Number(p.owed.toFixed(decimals)),
         email: p.email || null,
+        name: p.name || null,
         description: p.note || null,
       }));
       const payload = {
@@ -597,7 +597,7 @@
       const data = await apiCreateBill(payload);
       const billNumber = data?.bill_number;
       if (!billNumber) throw new Error('No bill number');
-      const shareUrl = `${window.location.origin}/api/bill/share/${encodeURIComponent(billNumber)}`;
+      const shareUrl = `${URL_BASE}/bill/share/${encodeURIComponent(billNumber)}`;
       document.getElementById('share-url').value = shareUrl;
       generateQRCode(shareUrl);
       const shareModal = document.getElementById('share-modal');
@@ -626,6 +626,7 @@
       const bill_participants = r.perList.map(p => ({
         amount: Number(p.owed.toFixed(decimals)),
         email: p.email || null,
+        name: p.name || null,
         description: p.note || null,
       }));
       const payload = {
@@ -652,7 +653,7 @@
       const data = await apiCreateBill(payload);
       const billNumber = data?.bill_number;
       if (!billNumber) throw new Error('No bill number');
-      const shareUrl = `${window.location.origin}/api/bill/${encodeURIComponent(billNumber)}`;
+      const shareUrl = `${URL_BASE}/bill/share/${encodeURIComponent(billNumber)}`;
       document.getElementById('share-url').value = shareUrl;
       generateQRCode(shareUrl);
       const shareModal = document.getElementById('share-modal');
