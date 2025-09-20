@@ -1,0 +1,143 @@
+# English translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-07-06 12:09+0700\n"
+"PO-Revision-Date: 2025-07-06 11:57+0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app/auth/services/auth_service.py:104 app/auth/services/auth_service.py:109
+msgid "There is an error in your ID or password!"
+msgstr "There is an error in your ID or password!"
+
+#: app/common/exceptions.py:11
+msgid "Un-Authentication!"
+msgstr "Un-Authentication!"
+
+#: app/common/exceptions.py:16
+msgid "Permission Denied"
+msgstr "Permission Denied"
+
+#: app/common/command/init_master.py:73
+msgid "Full Moon"
+msgstr "Full Moon"
+
+#: app/common/command/init_master.py:101 app/common/command/init_master.py:115
+msgid "New Moon"
+msgstr "New Moon"
+
+#: app/common/command/init_master.py:149 app/common/command/init_master.py:163
+msgid "Lunar New Year"
+msgstr "Lunar New Year"
+
+#: app/notification/services/notification_event.py:204
+msgid "5 phút"
+msgstr "5 phút"
+
+#: app/notification/services/notification_event.py:205
+msgid "15 phút"
+msgstr "15 phút"
+
+#: app/notification/services/notification_event.py:206
+msgid "30 phút"
+msgstr "30 phút"
+
+#: app/notification/services/notification_event.py:207
+msgid "1 giờ"
+msgstr "1 giờ"
+
+#: app/notification/services/notification_event.py:208
+msgid "6 giờ"
+msgstr "6 giờ"
+
+#: app/notification/services/notification_event.py:209
+msgid "1 ngày"
+msgstr "1 ngày"
+
+#: app/notification/services/notification_event.py:210
+msgid "1 tuần"
+msgstr "1 tuần"
+
+#: app/notification/services/notification_event.py:211
+msgid "1 tháng"
+msgstr "1 tháng"
+
+#: app/notification/services/notification_event.py:213
+msgid "0 phút"
+msgstr "0 phút"
+
+#: core/common/auth.py:44
+msgid "Token type not allow"
+msgstr "Token type not allow"
+
+#: core/common/exceptions.py:17
+msgid "System error!"
+msgstr "System error!"
+
+#: core/common/exceptions.py:24
+msgid "Service error!"
+msgstr "Service error!"
+
+#: core/common/exceptions.py:29
+msgid "Not found!"
+msgstr "Not found!"
+
+#: core/common/exceptions.py:34
+msgid "Bad request!"
+msgstr "Bad request!"
+
+#: core/common/exceptions.py:41
+msgid "UnAuthenticated"
+msgstr "UnAuthenticated"
+
+#: web/constant.py:4
+msgid "Sự kiện"
+msgstr "Sự kiện"
+
+#: web/constant.py:5
+#, fuzzy
+msgid "Monday"
+msgstr "MONDAY"
+
+#: web/constant.py:6
+#, fuzzy
+msgid "Tuesday"
+msgstr "TUESDAY"
+
+#: web/constant.py:7
+#, fuzzy
+msgid "Wednesday"
+msgstr "WEDNESDAY"
+
+#: web/constant.py:8
+#, fuzzy
+msgid "Thursday"
+msgstr "THURSDAY"
+
+#: web/constant.py:9
+#, fuzzy
+msgid "Friday"
+msgstr "FRIDAY"
+
+#: web/constant.py:10
+#, fuzzy
+msgid "Saturday"
+msgstr "SATURDAY"
+
+#: web/constant.py:11
+#, fuzzy
+msgid "Sunday"
+msgstr "SUNDAY"
+
