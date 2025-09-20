@@ -59,6 +59,12 @@ app.include_router(web_routers)
 app.include_router(routers, prefix="/api")
 
 
-# @app.exception_handler(404)
-# async def custom_404_handler(request: Request, exc: Exception):
-#     return RedirectResponse(url="/not-found")
+@app.exception_handler(404)
+async def custom_404_handler(request: Request, exc: Exception):
+    if request.url.path.startswith("/api") or request.url.path.startswith("/assets"):
+        return base_error_handler(
+            request,
+            BillFasterBaseException(status_code=404, message="API endpoint not found"),
+        )
+
+    return RedirectResponse(url="/not-found")

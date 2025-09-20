@@ -48,13 +48,22 @@ async def robots_page(
     from fastapi.responses import Response
 
     robots_content = """User-agent: *
-Disallow: /api/
-Disallow: /admin/
-Allow: /static/assets/css/
-Allow: /static/assets/image/
-Allow: /static/manifest.json
+Allow: /
 
-Sitemap: https://splitbillfaster.com/sitemap.xml"""
+# Sitemap
+Sitemap: https://splitbillfaster.com/sitemap.xml
+
+# Disallow admin areas (if any)
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+
+# Allow important pages
+Allow: /
+Allow: /about
+Allow: /privacy-policy
+Allow: /login
+"""
 
     return Response(
         content=robots_content,
@@ -91,6 +100,36 @@ async def privacy_policy_page(
     """Privacy Policy page"""
     return config.templates.TemplateResponse(
         "privacy_policy.html",
+        {
+            "request": request,
+            "configs": {
+                "fe_base_uri": config.FRONTEND_BASE_URI,
+            },
+        },
+    )
+
+@other_routers.get("/terms-of-service")
+async def terms_of_service_page(
+    request: Request,
+):
+    """Terms of Service page"""
+    return config.templates.TemplateResponse(
+        "terms_of_service.html",
+        {
+            "request": request,
+            "configs": {
+                "fe_base_uri": config.FRONTEND_BASE_URI,
+            },
+        },
+    )
+
+@other_routers.get("/cookies-policy")
+async def cookies_policy_page(
+    request: Request,
+):
+    """Cookies Policy page"""
+    return config.templates.TemplateResponse(
+        "/cookies_policy.html",
         {
             "request": request,
             "configs": {
