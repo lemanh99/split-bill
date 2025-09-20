@@ -15,18 +15,18 @@ services:
     networks:
       - bill-faster-network
 
-#  bill-faster-be:
-#    build:
-#      context: .
-#    command: bash -c "python main.py"
-#    ports:
-#      - "${API_PORT}:8018"
-#    networks:
-#      - bill-faster-network
-#    env_file:
-#      - .env
-#    depends_on:
-#      - db-postgres
+  bill-faster-be:
+    build:
+      context: .
+    command: bash -c "python main.py"
+    ports:
+      - "${API_PORT}:8000"
+    networks:
+      - bill-faster-network
+    env_file:
+      - .env
+    depends_on:
+      - db-postgres
 
   minio:
     image: bitnami/minio:2024.5.28
