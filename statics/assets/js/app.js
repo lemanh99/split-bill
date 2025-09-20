@@ -1361,4 +1361,18 @@ loginForm?.addEventListener('submit', (e) => {
     window.location.href = '/login';
   });
 
+  // FAQ Toggle functionality
+  document.querySelectorAll('.faq-toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const content = toggle.nextElementSibling;
+      const icon = toggle.querySelector('.faq-icon');
+      
+      // Toggle content visibility
+      content.classList.toggle('hidden');
+      
+      // Rotate icon
+      icon.classList.toggle('rotate-180');
+    });
+  });
+
 })();
