@@ -36,7 +36,7 @@
       if (result.status_code === 200) {
         return result.data;
       } else {
-        throw new Error('API returned error: ' + JSON.stringify(result.errors));
+        window.location.href = '/bill/share/not-found';
       }
     } catch (error) {
       console.error('Error fetching bill data:', error);
@@ -527,21 +527,7 @@
       
       let billNumber = BILL_NUMBER;
       console.log('Bill number from template:', billNumber);
-      
-      // Fallback: get from URL if template variable is not available
-      if (!billNumber || billNumber === 'undefined' || billNumber === '') {
-        const pathParts = window.location.pathname.split('/');
-        billNumber = pathParts[pathParts.length - 1];
-        console.log('Bill number from URL:', billNumber);
-      }
-      
-      if (!billNumber || billNumber === 'undefined' || billNumber === '') {
-        throw new Error('Bill number not found in template or URL');
-      }
-      
-      console.log('Fetching bill data for:', billNumber);
       const apiData = await fetchBillData(billNumber);
-      console.log('API response:', apiData);
       
       billData = transformApiDataToDisplay(apiData);
       console.log('Transformed data:', billData);
@@ -569,9 +555,6 @@
 
   // Initialize when page loads
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded');
-    console.log('BILL_NUMBER available:', typeof BILL_NUMBER !== 'undefined');
-    console.log('API_BASE available:', typeof API_BASE !== 'undefined');
     initializePage();
   });
 })();
