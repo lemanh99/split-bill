@@ -1183,6 +1183,7 @@ const shareModal = document.getElementById('share-modal');
 const closeShareModal = document.getElementById('close-share-modal');
 const shareUrlEl = document.getElementById('share-url');
 const copyUrlEl = document.getElementById('copy-url');
+const openUrlEl = document.getElementById('open-url');
 
 // Hide share modal
 closeShareModal?.addEventListener('click', () => {
@@ -1195,6 +1196,14 @@ shareModal?.addEventListener('click', (e) => {
   if (e.target === shareModal) {
     shareModal.classList.add('hidden');
     shareModal.classList.remove('flex');
+  }
+});
+
+// Open URL in new tab
+openUrlEl?.addEventListener('click', () => {
+  const url = shareUrlEl.value;
+  if (url) {
+    window.open(url, '_blank');
   }
 });
 
