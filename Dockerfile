@@ -5,7 +5,7 @@ FROM python:3.12
 
 ENV PYTHONUNBUFFERED 1
 
-EXPOSE 8018
+EXPOSE 8000
 
 WORKDIR /work
 
@@ -17,4 +17,4 @@ COPY . /work
 
 RUN pybabel compile -d i18n
 
-CMD python main.py
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
