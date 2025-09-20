@@ -50,6 +50,7 @@ class BillCrUpSchema(BaseModel):
 class BillParticipantDetailSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
+    name : str | None = Field(default=None, max_length=100)
     amount: Decimal = Field(...)
     email: str | None = Field(default=None)
     description: str | None = Field(default=None)

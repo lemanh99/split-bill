@@ -60,7 +60,7 @@ class BillService(BillFasterBaseService):
 
         self.db_session.add_all(participants)
 
-    async def create(self, user: User | None, create_schema: BillCrUpSchema):
+    async def create(self, user: dict | None, create_schema: BillCrUpSchema):
         try:
             if create_schema.share_type == BillShareType.PRIVATE and not user:
                 raise BillFasterBadRequestException(
@@ -75,7 +75,7 @@ class BillService(BillFasterBaseService):
                     "-", ""
                 )
             )
-            data_fields["created_by"] = user.user_id if user else None
+            data_fields["created_by"] = user['user_id'] if user else None
             new_bill = Bill(**data_fields)
             self.db_session.add(new_bill)
             await self.db_session.flush()
@@ -97,7 +97,7 @@ class BillService(BillFasterBaseService):
             raise BillFasterBadRequestException()
 
     async def update(
-        self, user: User | None, bill_number: str, update_schema: BillCrUpSchema
+        self, user: dict | None, bill_number: str, update_schema: BillCrUpSchema
     ):
         bill = await self._get_bill_by_bill_number(bill_number)
         if not bill:
@@ -117,9 +117,9 @@ class BillService(BillFasterBaseService):
             setattr(
                 bill,
                 "created_by",
-                user.user_id if user and not bill.created_by else bill.created_by,
+                user['user_id'] if user and not bill.created_by else bill.created_by,
             )
-            setattr(bill, "updated_by", user.user_id if user else None)
+            setattr(bill, "updated_by", user['user_id'] if user else None)
             await self._create_or_update_bill_items(bill.id, update_schema.bill_items)
             await self._create_or_update_bill_participants(
                 bill.id, update_schema.bill_participants
@@ -169,14 +169,15 @@ class BillService(BillFasterBaseService):
             bill_participants = await self._get_bill_participants(bill.id)
             if (
                 bill.share_type == BillShareType.PRIVATE
-                and bill.created_by != user.user_id
+                and user
+                and bill.created_by != user['user_id']
             ):
                 email_participants = [
                     participant.email
                     for participant in bill_participants
                     if participant.email
                 ]
-                if user.email not in email_participants:
+                if user['email'] not in email_participants:
                     raise BillFasterNotFoundException()
 
             setattr(bill, "bill_participants", bill_participants)
